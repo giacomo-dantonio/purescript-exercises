@@ -14,4 +14,4 @@ Initialize the repository with bower:
 
 You can then run the tests:
 
-    psc test
+    pulp test
