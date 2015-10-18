@@ -1,7 +1,7 @@
 module Exercises.Chapter5 where
 
 import Prelude
-
+import Data.Maybe
 import Data.Picture
 
 -- Section 5.5
@@ -55,3 +55,19 @@ fromSingleton dflt _ = dflt
 
 circleCenteredAtOrigin :: Shape
 circleCenteredAtOrigin = Circle (Point {x: 0.0, y: 0.0}) 10.0
+
+-- 2
+
+scalePoint (Point {x: x, y: y}) = Point {x: 2.0 * x, y: 2.0 * y}
+
+scaleShape :: Shape -> Shape
+scaleShape (Circle p radius) = Circle (scalePoint p) (2.0 * radius)
+scaleShape (Rectangle c w h) = Rectangle (scalePoint c) (2.0 * w) (2.0 * h)
+scaleShape (Line start end) = Line (scalePoint start) (scalePoint end)
+scaleShape (Text loc text) = Text (scalePoint loc) text
+
+-- 3
+
+extractText :: Shape -> Maybe String
+extractText (Text _ text) = Just text
+extractText _ = Nothing
