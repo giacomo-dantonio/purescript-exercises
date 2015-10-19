@@ -3,6 +3,9 @@ module Exercises.Chapter5 where
 import Prelude
 import Data.Maybe
 import Data.Picture
+import Data.Foldable
+
+import Math (pi)
 
 -- Section 5.5
 
@@ -71,3 +74,25 @@ scaleShape (Text loc text) = Text (scalePoint loc) text
 extractText :: Shape -> Maybe String
 extractText (Text _ text) = Just text
 extractText _ = Nothing
+
+
+-- Section 5.16
+
+-- 1
+
+area :: Shape -> Number
+area (Circle _ radius) = 2.0 * pi * radius
+area (Rectangle _ w h) = w * h
+area _ = 0.0
+
+-- 2
+
+bounds' :: Picture -> Bounds
+bounds' = foldl combine emptyBounds
+  where
+  combine :: Bounds -> Shape -> Bounds
+  combine b shape = shapeBounds' shape \/ b
+
+shapeBounds' :: Shape -> Bounds
+shapeBounds' (Clipped pic shape) = (bounds pic) /\ (shapeBounds' shape)
+shapeBounds' shape = shapeBounds shape

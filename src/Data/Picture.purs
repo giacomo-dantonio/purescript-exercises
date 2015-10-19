@@ -18,6 +18,7 @@ data Shape
   | Rectangle Point Number Number
   | Line Point Point
   | Text Point String
+  | Clipped Picture Shape
 
 showShape :: Shape -> String
 showShape (Circle c r) = 
