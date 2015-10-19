@@ -55,5 +55,5 @@ chapter5 = do
   assert $ extractText (Circle (Point {x: 1.0, y: 1.0}) 5.0) == Nothing
   assert $ extractText (Text (Point {x: 1.0, y: 1.0}) "Ni!") == Just "Ni!"
 
-  assert $ showBounds $ shapeBounds' $ Clipped [(Circle (Point {x: 0.0, y: 0.0}) 1.0)] (Rectangle (Point {x: 1.0, y: 1.0}) 2.0 2.0) ==
+  assert $ (showBounds $ shapeBounds' $ Clipped [(Circle (Point {x: 0.0, y: 0.0}) 1.0)] (Rectangle (Point {x: 1.0, y: 1.0}) 2.0 2.0)) ==
     "Bounds [top: 0.0, left: 0.0, bottom: 1.0, right: 1.0]"

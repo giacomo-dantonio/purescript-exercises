@@ -7,7 +7,7 @@ import Control.Monad.Eff.Console
 
 import Data.List (length)
 import Data.Maybe
-import Data.AddressBook
+import Data.AddressBook3
 
 import Exercises.Chapter3
 

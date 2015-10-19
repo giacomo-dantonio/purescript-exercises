@@ -2,39 +2,82 @@ module Data.AddressBook where
 
 import Prelude
 
-import Data.List
-import Data.Maybe
-
-import Control.Plus (empty)
-
-type Address = 
+newtype Address = Address 
   { street :: String
   , city   :: String 
   , state  :: String
   }
 
-type Entry =
+address :: String -> String -> String -> Address
+address street city state = Address
+  { street:  street
+  , city:    city
+  , state:   state
+  }
+
+data PhoneType 
+  = HomePhone 
+  | WorkPhone 
+  | CellPhone
+  | OtherPhone
+
+newtype PhoneNumber = PhoneNumber 
+  { "type" :: PhoneType
+  , number :: String
+  }
+
+phoneNumber :: PhoneType -> String -> PhoneNumber
+phoneNumber ty number = PhoneNumber
+  { "type": ty
+  , number: number
+  }
+
+newtype Person = Person
   { firstName :: String
   , lastName  :: String
   , address   :: Address
+  , phones    :: Array PhoneNumber
   }
 
-type AddressBook = List Entry
+person :: String -> String -> Address -> Array PhoneNumber -> Person
+person firstName lastName address phones = Person
+  { firstName: firstName
+  , lastName:  lastName
+  , address:   address
+  , phones:    phones
+  }
 
-showAddress :: Address -> String
-showAddress addr = addr.street ++ ", " ++ addr.city ++ ", " ++ addr.state
+examplePerson :: Person
+examplePerson = 
+  person "John" "Smith" 
+         (address "123 Fake St." "FakeTown" "CA") 
+         [ phoneNumber HomePhone "555-555-5555"
+         , phoneNumber CellPhone "555-555-0000"
+         ]
 
-showEntry :: Entry -> String
-showEntry entry = entry.lastName ++ ", " ++ entry.firstName ++ ": " ++ showAddress entry.address
+instance showAddress :: Show Address where
+  show (Address o) = "Address " ++
+    "{ street: " ++ show o.street ++
+    ", city: "   ++ show o.city ++
+    ", state: "  ++ show o.state ++
+    " }"
 
-emptyBook :: AddressBook
-emptyBook = empty
+instance showPhoneType :: Show PhoneType where
+  show HomePhone = "HomePhone"
+  show WorkPhone = "WorkPhone"
+  show CellPhone = "CellPhone"
+  show OtherPhone = "OtherPhone"
 
-insertEntry :: Entry -> AddressBook -> AddressBook
-insertEntry = Cons
- 
-findEntry :: String -> String -> AddressBook -> Maybe Entry
-findEntry firstName lastName = head <<< filter filterEntry 
-  where
-  filterEntry :: Entry -> Boolean
-  filterEntry entry = entry.firstName == firstName && entry.lastName == lastName
+instance showPhoneNumber :: Show PhoneNumber where
+  show (PhoneNumber o) = "PhoneNumber " ++
+    "{ type: "   ++ show o."type" ++
+    ", number: " ++ show o.number ++
+    " }"
+
+instance showPerson :: Show Person where
+  show (Person o) = "Person " ++
+    "{ firstName: " ++ show o.firstName ++
+    ", lastName: "  ++ show o.lastName ++
+    ", address: "   ++ show o.address ++
+    ", phones: "    ++ show o.phones ++
+    " }"

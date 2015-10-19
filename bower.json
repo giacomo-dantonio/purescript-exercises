@@ -19,6 +19,11 @@
     "purescript-strings": "~0.7.0",
     "purescript-foldable-traversable": "~0.4.0",
     "purescript-quickcheck": "~0.12.0",
-    "purescript-globals": "~0.2.1"
+    "purescript-globals": "~0.2.1",
+    "purescript-tuples": "~0.4.0",
+    "purescript-maybe": "~0.3.4",
+    "purescript-either": "~0.2.3",
+    "purescript-functions": "~0.1.0",
+    "purescript-validation": "~0.2.1"
   }
 }

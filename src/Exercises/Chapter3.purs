@@ -1,7 +1,7 @@
 module Exercises.Chapter3 where
 
 import Prelude
-import Data.AddressBook
+import Data.AddressBook3
 import Data.Maybe
 import Data.List
 

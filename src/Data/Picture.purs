@@ -30,6 +30,11 @@ showShape (Line start end) =
 showShape (Text loc text) = 
   "Text [location: " ++ showPoint loc ++ ", text: " ++ show text ++ "]"
 
+
+instance showShape' :: Show Shape where
+  show shape = (showShape shape)
+
+
 type Picture = Array Shape
 
 showPicture :: Picture -> Array String
