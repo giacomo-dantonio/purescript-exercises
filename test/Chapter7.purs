@@ -5,7 +5,9 @@ import Test.Assert
 import Test.QuickCheck
 import Data.Maybe
 import Data.Either
+import Data.Validation
 
+import Data.AddressBook
 import Exercises.Chapter7
 
 
@@ -29,3 +31,9 @@ chapter7 = do
 
   assert $ (combineMaybe $ Just (Right 1 :: Either String Int)) == Right (Just 1)
   assert $ (combineMaybe (Nothing :: Maybe (Either String Int))) == Right Nothing
+
+  assert $ isValid $ validateState $ address "Obernstraße" "Bremen" "HB"
+  assert $ not isValid $ validateState $ address "Obernstraße" "Bremen" "Bremen"
+
+  assert $ isValid $ nonEmpty' "" " asasgasg szg     "
+  assert $ not isValid $ nonEmpty' "" "    \t    "
