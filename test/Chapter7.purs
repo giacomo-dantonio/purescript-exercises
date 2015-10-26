@@ -6,6 +6,7 @@ import Test.QuickCheck
 import Data.Maybe
 import Data.Either
 import Data.Validation
+import Data.Traversable
 
 import Data.AddressBook
 import Exercises.Chapter7
@@ -37,3 +38,10 @@ chapter7 = do
 
   assert $ isValid $ nonEmpty' "" " asasgasg szg     "
   assert $ not isValid $ nonEmpty' "" "    \t    "
+
+  let tree = Branch (Branch Leaf 1 Leaf) 2 (Branch Leaf 3 Leaf)
+  assert $ visitLeftToRight tree == [1, 2, 3]
+  assert $ visitRightToLeft tree == [3, 2, 1]
+
+  let maybeTree = Branch (Branch Leaf (Just 1) Leaf) (Just 2) (Branch Leaf (Just 3) Leaf)
+  assert $ sequence maybeTree == Just tree
