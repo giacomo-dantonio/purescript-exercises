@@ -3,6 +3,7 @@ module Control.Monad.Eff.DOM where
 import Prelude
 
 import DOM
+import DOM.Node.Types
 
 import Data.Maybe
 import Data.Foreign
