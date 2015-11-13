@@ -1,10 +1,19 @@
 module Exercises.Chapter8 where
 
 import Prelude
-import Data.Array (head, tail, sort, nub, foldM)
+import Data.Array (head, tail, sort, nub, foldM, length, filter)
 import Data.Maybe
 import Data.Foldable
 import Data.List (List(..))
+
+import Control.Monad.Eff
+import Control.Monad.Eff.Exception
+import Control.Monad.Eff.Random
+
+import Control.Monad.ST
+import Data.Array.ST
+import Data.Int
+
 
 -- Section 8.7
 
@@ -56,3 +65,36 @@ filterM' f (Cons b bs) = do
 --    y <- return b
 --    return (g y) = (left identity, twice)
 --  return (f a b)
+
+-- Section 8.17
+
+-- 1
+
+safeDivide :: Int -> Int -> forall eff. Eff (err :: EXCEPTION | eff) Int
+safeDivide _ 0 = throwException $ error "Boom!"
+safeDivide a b = return (a / b)
+
+-- 2
+
+data Point = Point Number Number
+
+squareNorm :: Point -> Number
+squareNorm (Point x y) = x*x + y*y
+
+
+estimatePi :: Int -> forall eff. Eff (random :: RANDOM | eff) Number
+estimatePi n = do
+  points <- randomArray n
+  let m = length $ filter (\p -> squareNorm p <= 1.0) points
+  return (4.0 * toNumber m / toNumber n)
+
+  where
+  randomArray :: Int -> forall eff. Eff (random :: RANDOM | eff) (Array Point)
+  randomArray n = runSTArray do
+    arr <- emptySTArray
+    forE 0.0 (toNumber n) $ \i -> do
+      x <- randomRange (-1.0) 1.0
+      y <- randomRange (-1.0) 1.0
+      pushSTArray arr (Point x y)
+      return unit
+    return arr
