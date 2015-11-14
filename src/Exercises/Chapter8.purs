@@ -98,3 +98,22 @@ estimatePi n = do
       pushSTArray arr (Point x y)
       return unit
     return arr
+
+-- alternative version without arrays
+
+estimatePi' :: Int -> forall eff. Eff (random :: RANDOM | eff) Number
+estimatePi' n = do
+  m <- randomTests
+  return (4.0 * toNumber m / toNumber n)
+
+  where
+  randomTests = runST do
+    ref <- newSTRef 0
+    forE 0.0 (toNumber n) $ \i -> do
+      x <- randomRange (-1.0) 1.0
+      y <- randomRange (-1.0) 1.0
+      modifySTRef ref (if x*x + y*y <= 1.0 then add 1 else id)
+      return unit
+    result <- readSTRef ref
+    return result
+
