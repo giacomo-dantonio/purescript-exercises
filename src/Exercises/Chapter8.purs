@@ -117,3 +117,8 @@ estimatePi' n = do
     result <- readSTRef ref
     return result
 
+-- Section 8.19
+
+-- 1 and 2
+
+-- implemented in Main.purs und UI.purs
