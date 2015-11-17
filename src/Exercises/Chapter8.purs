@@ -119,6 +119,6 @@ estimatePi' n = do
 
 -- Section 8.19
 
--- 1 and 2
+-- 1, 2, 3 and 4
 
 -- implemented in Main.purs und UI.purs

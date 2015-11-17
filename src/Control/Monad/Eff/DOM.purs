@@ -17,6 +17,8 @@ foreign import createElement :: forall eff. String -> Eff (dom :: DOM | eff) Nod
 
 foreign import querySelectorImpl :: forall eff r. Fn3 r (Node -> r) String (Eff (dom :: DOM | eff) r)
 
+foreign import querySelectorAll :: forall eff. String -> Eff (dom :: DOM | eff) (Array Node)
+
 querySelector :: forall eff. String -> Eff (dom :: DOM | eff) (Maybe Node)
 querySelector s = runFn3 querySelectorImpl Nothing Just s
 

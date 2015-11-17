@@ -11,7 +11,7 @@ import Control.Apply
 import qualified Data.String.Regex as R
 
 import Data.AddressBook
-import Data.AddressBook.Validation
+import Data.AddressBook.ValidationChapter7
 
 
 combineList :: forall f a. (Applicative f) => List (f a) -> f (List a)

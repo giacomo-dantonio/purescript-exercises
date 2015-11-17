@@ -345,6 +345,12 @@ var PS = { };
       };
   };
 
+  exports.querySelectorAll = function(selector) {
+      return function() {
+	  return Array.prototype.slice.apply(document.querySelectorAll(selector));
+      };
+  };
+
   exports.appendChild = function(child) {
       return function(node) {
           return function() {
@@ -802,6 +808,7 @@ var PS = { };
   exports["setText"] = $foreign.setText;
   exports["addClass"] = $foreign.addClass;
   exports["appendChild"] = $foreign.appendChild;
+  exports["querySelectorAll"] = $foreign.querySelectorAll;
   exports["createElement"] = $foreign.createElement;
   exports["body"] = $foreign.body;;
  
@@ -1102,6 +1109,69 @@ var PS = { };
   var Data_String = PS["Data.String"];
   var Data_String_Regex = PS["Data.String.Regex"];
   var Control_Apply = PS["Control.Apply"];     
+  var FirstNameField = (function () {
+      function FirstNameField() {
+
+      };
+      FirstNameField.value = new FirstNameField();
+      return FirstNameField;
+  })();
+  var LastNameField = (function () {
+      function LastNameField() {
+
+      };
+      LastNameField.value = new LastNameField();
+      return LastNameField;
+  })();
+  var StreetField = (function () {
+      function StreetField() {
+
+      };
+      StreetField.value = new StreetField();
+      return StreetField;
+  })();
+  var CityField = (function () {
+      function CityField() {
+
+      };
+      CityField.value = new CityField();
+      return CityField;
+  })();
+  var StateField = (function () {
+      function StateField() {
+
+      };
+      StateField.value = new StateField();
+      return StateField;
+  })();
+  var PhoneList = (function () {
+      function PhoneList() {
+
+      };
+      PhoneList.value = new PhoneList();
+      return PhoneList;
+  })();
+  var PhoneField = (function () {
+      function PhoneField(value0) {
+          this.value0 = value0;
+      };
+      PhoneField.create = function (value0) {
+          return new PhoneField(value0);
+      };
+      return PhoneField;
+  })();
+  var ValidationError = (function () {
+      function ValidationError(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      ValidationError.create = function (value0) {
+          return function (value1) {
+              return new ValidationError(value0, value1);
+          };
+      };
+      return ValidationError;
+  })();
   var phoneNumberRegex = Data_String_Regex.regex("^\\d{3}-\\d{3}-\\d{4}$")({
       unicode: false, 
       sticky: false, 
@@ -1109,12 +1179,38 @@ var PS = { };
       ignoreCase: false, 
       global: false
   });
-  var nonEmpty = function (field) {
-      return function (_13) {
-          if (_13 === "") {
-              return Data_Validation.invalid([ "Field '" + (field + "' cannot be empty") ]);
+  var fieldShow = new Prelude.Show(function (_12) {
+      if (_12 instanceof FirstNameField) {
+          return "FirstName";
+      };
+      if (_12 instanceof LastNameField) {
+          return "LastName";
+      };
+      if (_12 instanceof StreetField) {
+          return "Street";
+      };
+      if (_12 instanceof CityField) {
+          return "City";
+      };
+      if (_12 instanceof StateField) {
+          return "State";
+      };
+      if (_12 instanceof PhoneList) {
+          return "PhoneNumbers";
+      };
+      if (_12 instanceof PhoneField) {
+          return Prelude.show(Data_AddressBook.showPhoneType)(_12.value0);
+      };
+      throw new Error("Failed pattern match at Data.AddressBook.Validation line 28, column 1 - line 38, column 1: " + [ _12.constructor.name ]);
+  });
+  var lengthIs = function (field) {
+      return function (len) {
+          return function (value) {
+              if (Data_String.length(value) !== len) {
+                  return Data_Validation.invalid([ new ValidationError("Field '" + (Prelude.show(fieldShow)(field) + ("' must have length " + Prelude.show(Prelude.showInt)(len))), field) ]);
+              };
+              return Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(Prelude.unit);
           };
-          return Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(Prelude.unit);
       };
   };
   var matches = function (field) {
@@ -1123,40 +1219,46 @@ var PS = { };
               if (Data_String_Regex.test(regex)(value)) {
                   return Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(Prelude.unit);
               };
-              return Data_Validation.invalid([ "Field '" + (field + "' did not match the required format") ]);
+              return Data_Validation.invalid([ new ValidationError("Field '" + (Prelude.show(fieldShow)(field) + "' did not match the required format"), field) ]);
           };
       };
   };
-  var validatePhoneNumber = function (_16) {
-      return Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<$>"](Data_Validation.functorV)(Data_AddressBook.phoneNumber)(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_16.type)))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(matches("Number")(phoneNumberRegex)(_16.number))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_16.number)));
+  var validatePhoneNumber = function (_10) {
+      return Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<$>"](Data_Validation.functorV)(Data_AddressBook.phoneNumber)(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_10.type)))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(matches(new PhoneField(_10.type))(phoneNumberRegex)(_10.number))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_10.number)));
   };
-  var lengthIs = function (field) {
-      return function (len) {
-          return function (value) {
-              if (Data_String.length(value) !== len) {
-                  return Data_Validation.invalid([ "Field '" + (field + ("' must have length " + Prelude.show(Prelude.showInt)(len))) ]);
-              };
-              return Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(Prelude.unit);
-          };
-      };
-  };
-  var validateAddress = function (_15) {
-      return Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<$>"](Data_Validation.functorV)(Data_AddressBook.address)(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(nonEmpty("Street")(_15.street))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_15.street))))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(nonEmpty("City")(_15.city))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_15.city))))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(lengthIs("State")(2)(_15.state))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_15.state)));
-  };
-  var arrayNonEmpty = function (field) {
-      return function (_14) {
-          if (_14.length === 0) {
-              return Data_Validation.invalid([ "Field '" + (field + "' must contain at least one value") ]);
+  var nonEmpty = function (field) {
+      return function (_7) {
+          if (_7 === "") {
+              return Data_Validation.invalid([ new ValidationError("Field '" + (Prelude.show(fieldShow)(field) + "' cannot be empty"), field) ]);
           };
           return Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(Prelude.unit);
       };
   };
-  var validatePerson = function (_17) {
-      return Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<$>"](Data_Validation.functorV)(Data_AddressBook.person)(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(nonEmpty("First Name")(_17.firstName))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_17.firstName))))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(nonEmpty("Last Name")(_17.lastName))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_17.lastName))))(validateAddress(_17.address)))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(arrayNonEmpty("Phone Numbers")(_17.phones))(Data_Traversable.traverse(Data_Traversable.traversableArray)(Data_Validation.applicativeV(Prelude.semigroupArray))(validatePhoneNumber)(_17.phones)));
+  var validateAddress = function (_9) {
+      return Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<$>"](Data_Validation.functorV)(Data_AddressBook.address)(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(nonEmpty(StreetField.value)(_9.street))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_9.street))))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(nonEmpty(CityField.value)(_9.city))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_9.city))))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(lengthIs(StateField.value)(2)(_9.state))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_9.state)));
+  };
+  var arrayNonEmpty = function (field) {
+      return function (_8) {
+          if (_8.length === 0) {
+              return Data_Validation.invalid([ new ValidationError("Field '" + (Prelude.show(fieldShow)(field) + "' must contain at least one value"), field) ]);
+          };
+          return Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(Prelude.unit);
+      };
+  };
+  var validatePerson = function (_11) {
+      return Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<*>"](Data_Validation.applyV(Prelude.semigroupArray))(Prelude["<$>"](Data_Validation.functorV)(Data_AddressBook.person)(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(nonEmpty(FirstNameField.value)(_11.firstName))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_11.firstName))))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(nonEmpty(LastNameField.value)(_11.lastName))(Prelude.pure(Data_Validation.applicativeV(Prelude.semigroupArray))(_11.lastName))))(validateAddress(_11.address)))(Control_Apply["*>"](Data_Validation.applyV(Prelude.semigroupArray))(arrayNonEmpty(PhoneList.value)(_11.phones))(Data_Traversable.traverse(Data_Traversable.traversableArray)(Data_Validation.applicativeV(Prelude.semigroupArray))(validatePhoneNumber)(_11.phones)));
   };
   var validatePerson$prime = function (p) {
       return Data_Validation.runV(Data_Either.Left.create)(Data_Either.Right.create)(validatePerson(p));
   };
+  exports["FirstNameField"] = FirstNameField;
+  exports["LastNameField"] = LastNameField;
+  exports["StreetField"] = StreetField;
+  exports["CityField"] = CityField;
+  exports["StateField"] = StateField;
+  exports["PhoneList"] = PhoneList;
+  exports["PhoneField"] = PhoneField;
+  exports["ValidationError"] = ValidationError;
   exports["validatePerson'"] = validatePerson$prime;
   exports["validatePerson"] = validatePerson;
   exports["validatePhoneNumber"] = validatePhoneNumber;
@@ -1165,7 +1267,8 @@ var PS = { };
   exports["phoneNumberRegex"] = phoneNumberRegex;
   exports["lengthIs"] = lengthIs;
   exports["arrayNonEmpty"] = arrayNonEmpty;
-  exports["nonEmpty"] = nonEmpty;;
+  exports["nonEmpty"] = nonEmpty;
+  exports["fieldShow"] = fieldShow;;
  
 })(PS["Data.AddressBook.Validation"] = PS["Data.AddressBook.Validation"] || {});
 (function(exports) {
@@ -1195,9 +1298,9 @@ var PS = { };
                   return function __do() {
                       var _0 = Control_Monad_Eff_DOM.getValue(_1.value0)();
                       return Prelude["return"](Control_Monad_Eff.applicativeEff)((function () {
-                          var _10 = Data_Foreign_Class.read(Data_Foreign_Class.stringIsForeign)(_0);
-                          if (_10 instanceof Data_Either.Right) {
-                              return _10.value0;
+                          var _11 = Data_Foreign_Class.read(Data_Foreign_Class.stringIsForeign)(_0);
+                          if (_11 instanceof Data_Either.Right) {
+                              return _11.value0;
                           };
                           return "";
                       })())();
@@ -1214,40 +1317,42 @@ var PS = { };
   };
   var displayValidationErrors = function (errs) {
       return function __do() {
-          var _3 = Control_Monad_Eff_DOM.querySelector("#validationErrors")();
-          if (_3 instanceof Data_Maybe.Just) {
-              Control_Monad_Eff.foreachE(errs)(function (err) {
-                  return function __do() {
+          Control_Monad_Eff.foreachE(errs)(function (_7) {
+              return function __do() {
+                  var _3 = Control_Monad_Eff_DOM.querySelector("div.errors" + Prelude.show(Data_AddressBook_Validation.fieldShow)(_7.value1))();
+                  if (_3 instanceof Data_Maybe.Just) {
                       var _2 = Control_Monad_Eff_DOM.createElement("div")();
                       Control_Monad_Eff_DOM.addClass("alert")(_2)();
                       Control_Monad_Eff_DOM.addClass("alert-danger")(_2)();
-                      Control_Monad_Eff_DOM.setText(err)(_2)();
+                      Control_Monad_Eff_DOM.setText(_7.value0)(_2)();
                       Control_Monad_Eff_DOM.appendChild(_2)(_3.value0)();
                       return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
                   };
-              })();
-              return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
-          };
-          throw new Error("Failed pattern match at Data.AddressBook.UI line 32, column 1 - line 33, column 1: " + [ _3.constructor.name ]);
+                  throw new Error("Failed pattern match at Data.AddressBook.UI line 32, column 1 - line 33, column 1: " + [ _3.constructor.name ]);
+              };
+          })();
+          return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
       };
   };
   var validateAndUpdateUI = function __do() {
-      var _6 = Control_Monad_Eff_DOM.querySelector("#validationErrors")();
-      if (_6 instanceof Data_Maybe.Just) {
-          Control_Monad_Eff_DOM.setInnerHTML("")(_6.value0)();
-          var _5 = validateControls();
-          (function () {
-              if (_5 instanceof Data_Either.Left) {
-                  return displayValidationErrors(_5.value0);
-              };
-              if (_5 instanceof Data_Either.Right) {
-                  return Control_Monad_Eff_Console.print(Data_AddressBook.showPerson)(_5.value0);
-              };
-              throw new Error("Failed pattern match at Data.AddressBook.UI line 60, column 1 - line 61, column 1: " + [ _5.constructor.name ]);
-          })()();
-          return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
-      };
-      throw new Error("Failed pattern match at Data.AddressBook.UI line 60, column 1 - line 61, column 1: " + [ _6.constructor.name ]);
+      var _6 = Control_Monad_Eff_DOM.querySelectorAll(".validationErrors")();
+      Control_Monad_Eff.foreachE(_6)(function (div) {
+          return function __do() {
+              Control_Monad_Eff_DOM.setInnerHTML("")(div)();
+              return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
+          };
+      })();
+      var _5 = validateControls();
+      (function () {
+          if (_5 instanceof Data_Either.Left) {
+              return displayValidationErrors(_5.value0);
+          };
+          if (_5 instanceof Data_Either.Right) {
+              return Control_Monad_Eff_Console.print(Data_AddressBook.showPerson)(_5.value0);
+          };
+          throw new Error("Failed pattern match at Data.AddressBook.UI line 61, column 1 - line 62, column 1: " + [ _5.constructor.name ]);
+      })()();
+      return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
   };
   var setupEventHandlers = function __do() {
       Prelude[">>="](Control_Monad_Eff.bindEff)(Control_Monad_Eff_DOM.body)(Control_Monad_Eff_DOM.addEventListener("change")(validateAndUpdateUI))();

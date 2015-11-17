@@ -29,19 +29,20 @@ valueOf sel = do
         Right s -> s
         _ -> ""
 
-displayValidationErrors :: forall eff. Array String -> Eff (dom :: DOM | eff) Unit
+displayValidationErrors :: forall eff. Errors -> Eff (dom :: DOM | eff) Unit
 displayValidationErrors errs = do
-  Just validationErrors <- querySelector "#validationErrors"
-  foreachE errs $ \err -> do
+  foreachE errs $ \(ValidationError err field) -> do
+    Just errorDiv <- querySelector $ "div.errors" ++ (show field)
+
     alert <- createElement "div"
     addClass "alert" alert
     addClass "alert-danger" alert
     setText err alert
-    appendChild alert validationErrors
+    appendChild alert errorDiv
     return unit
   return unit
 
-validateControls :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) (Either (Array String) Person)
+validateControls :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) (Either Errors Person)
 validateControls = do
   log "Running validators"
 
@@ -59,8 +60,10 @@ validateControls = do
 
 validateAndUpdateUI :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) Unit
 validateAndUpdateUI = do
-  Just validationErrors <- querySelector "#validationErrors"
-  setInnerHTML "" validationErrors
+  errorDivs <- querySelectorAll ".validationErrors"
+  foreachE errorDivs $ \div -> do
+    setInnerHTML "" div
+    return unit
 
   errorsOrResult <- validateControls
 

@@ -19,6 +19,12 @@ exports.querySelectorImpl = function(r, f, s) {
     };
 };
 
+exports.querySelectorAll = function(selector) {
+    return function() {
+	return Array.prototype.slice.apply(document.querySelectorAll(selector));
+    };
+};
+
 exports.appendChild = function(child) {
     return function(node) {
         return function() {
