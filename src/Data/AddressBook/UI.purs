@@ -15,7 +15,7 @@ import Data.Traversable (sequence)
 import Control.Bind
 
 import Control.Monad.Eff
-import Control.Monad.Eff.DOM
+import Control.Monad.Eff.DOM8
 import Control.Monad.Eff.Console
 
 valueOf :: forall eff. String -> Eff (dom :: DOM | eff) String

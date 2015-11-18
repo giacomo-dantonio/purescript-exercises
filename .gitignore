@@ -1,6 +1,8 @@
 /bower_components/
 /node_modules/
 /output/
+/dist/
 /.psci*
+/*.tix
 /src/.webpack.js
 **/*~
