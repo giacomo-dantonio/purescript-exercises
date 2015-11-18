@@ -12,4 +12,4 @@ import Data.AddressBook.UI
 main :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) Unit
 main = do
   log "Attaching event handlers"
-  setupEventHandlers 
+  setupEventHandlers
