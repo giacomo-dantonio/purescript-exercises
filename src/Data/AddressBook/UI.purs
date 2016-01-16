@@ -15,7 +15,7 @@ import Data.Traversable (sequence)
 import Control.Bind
 
 import Control.Monad.Eff
-import Control.Monad.Eff.DOM8
+import Control.Monad.Eff.DOM
 import Control.Monad.Eff.Console
 
 valueOf :: forall eff. String -> Eff (dom :: DOM | eff) String
@@ -29,20 +29,26 @@ valueOf sel = do
         Right s -> s
         _ -> ""
 
-displayValidationErrors :: forall eff. Errors -> Eff (dom :: DOM | eff) Unit
+displayValidationErrors :: forall eff. Array String -> Eff (dom :: DOM | eff) Unit
 displayValidationErrors errs = do
-  foreachE errs $ \(ValidationError err field) -> do
-    Just errorDiv <- querySelector $ "div.errors" ++ (show field)
+  alert <- createElement "div"
+    >>= addClass "alert"
+    >>= addClass "alert-danger"
 
-    alert <- createElement "div"
-    addClass "alert" alert
-    addClass "alert-danger" alert
-    setText err alert
-    appendChild alert errorDiv
+  ul <- createElement "ul"
+  ul `appendChild` alert
+
+  foreachE errs $ \err -> do
+    li <- createElement "li" >>= setText err
+    li `appendChild` ul
     return unit
+
+  Just validationErrors <- querySelector "#validationErrors"
+  alert `appendChild` validationErrors
+
   return unit
 
-validateControls :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) (Either Errors Person)
+validateControls :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) (Either (Array String) Person)
 validateControls = do
   log "Running validators"
 
@@ -53,17 +59,14 @@ validateControls = do
                            <*> valueOf "#inputState")
               <*> sequence [ phoneNumber HomePhone <$> valueOf "#inputHomePhone"
                            , phoneNumber CellPhone <$> valueOf "#inputCellPhone"
-                           , phoneNumber WorkPhone <$> valueOf "#inputWorkPhone"
                            ]
 
   return $ validatePerson' p
 
 validateAndUpdateUI :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) Unit
 validateAndUpdateUI = do
-  errorDivs <- querySelectorAll ".validationErrors"
-  foreachE errorDivs $ \div -> do
-    setInnerHTML "" div
-    return unit
+  Just validationErrors <- querySelector "#validationErrors"
+  setInnerHTML "" validationErrors
 
   errorsOrResult <- validateControls
 
