@@ -27,7 +27,7 @@
     "purescript-validation": "~0.2.1",
     "purescript-eff": "~0.1.1",
     "purescript-dom": "~0.2.8",
-    "purescript-foreign": "~0.7.0",
+    "purescript-foreign": "~0.7.2",
     "purescript-canvas": "~0.3.4",
     "purescript-refs": "~0.2.0"
   }
