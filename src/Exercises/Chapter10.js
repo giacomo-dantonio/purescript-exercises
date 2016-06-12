@@ -45,3 +45,18 @@ exports.mapHRec2 = function(f, rec) {
     }
     return mapped;
 };
+
+
+exports.confirm = function(msg) {
+    return function() {
+	window.confirm(msg);
+	return {};
+    };
+};
+
+
+exports.removeItem = function(key) {
+    return function() {
+        return window.localStorage.removeItem(key);
+    }
+};

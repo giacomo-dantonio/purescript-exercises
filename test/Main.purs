@@ -10,6 +10,7 @@ import Test.Chapter5 (chapter5)
 import Test.Chapter6 (chapter6)
 import Test.Chapter7 (chapter7)
 import Test.Chapter8 (chapter8)
+import Test.Chapter10 (chapter10)
 
 
 main = do
